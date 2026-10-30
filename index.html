@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>MEMS 电子鼻 · 检测工作台</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg:#07111f; --panel:#0d1b2d; --panel2:#102238; --line:rgba(158,188,214,.16);
+      --text:#eef7ff; --muted:#8fa8bd; --cyan:#3ee5d1; --blue:#6aa8ff;
+      --green:#6be69d; --yellow:#f5c867; --red:#ff7280; --radius:20px;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    }
+    *{box-sizing:border-box} body{margin:0;min-width:320px;color:var(--text);background:
+      radial-gradient(circle at 12% -5%,rgba(62,229,209,.13),transparent 32rem),
+      radial-gradient(circle at 93% 15%,rgba(106,168,255,.1),transparent 28rem),var(--bg)}
+    button,input,select{font:inherit} button{cursor:pointer} button:disabled{cursor:not-allowed;opacity:.43}
+    .shell{width:min(1480px,calc(100% - 30px));margin:auto;padding-bottom:56px}
+    .topbar{position:sticky;top:0;z-index:20;margin:0 -15px;padding:13px 15px;background:rgba(7,17,31,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+    .topin{width:min(1480px,100%);margin:auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(62,229,209,.35);border-radius:14px;background:linear-gradient(145deg,rgba(62,229,209,.16),rgba(106,168,255,.08));font-weight:900;color:var(--cyan)}
+    .brand h1{margin:0;font-size:16px}.brand p{margin:2px 0 0;color:var(--muted);font-size:11px}.topactions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .status{height:37px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:11px}.dot{width:8px;height:8px;border-radius:50%;background:#526678}.status.on{color:var(--green);border-color:rgba(107,230,157,.3)}.status.on .dot{background:var(--green);box-shadow:0 0 14px rgba(107,230,157,.7)}
+    .btn{min-height:39px;padding:0 14px;border:1px solid rgba(158,188,214,.25);border-radius:11px;color:var(--text);background:rgba(255,255,255,.035);transition:.16s ease}.btn:hover:not(:disabled){transform:translateY(-1px);border-color:rgba(106,168,255,.58);background:rgba(106,168,255,.08)}
+    .btn.primary{color:#021817;font-weight:800;border-color:transparent;background:linear-gradient(135deg,#58efd9,#59bee9)}.btn.red{color:#fff;font-weight:750;border-color:rgba(255,114,128,.5);background:rgba(255,114,128,.13)}.btn.green{color:#031a0d;font-weight:800;border-color:transparent;background:linear-gradient(135deg,#7aeba7,#45d7bb)}.btn.yellow{color:#241a02;font-weight:800;border-color:transparent;background:linear-gradient(135deg,#ffe18a,#f5ba59)}.btn.small{min-height:33px;padding:0 10px;font-size:11px;border-radius:9px}
+    .hero{padding:45px 0 24px;display:grid;grid-template-columns:1.18fr .82fr;gap:22px;align-items:end}.eyebrow{color:var(--cyan);font-size:11px;font-weight:850;letter-spacing:.16em}.hero h2{margin:9px 0 10px;font-size:clamp(32px,5vw,65px);line-height:1;letter-spacing:-.045em}.hero h2 span{color:transparent;background:linear-gradient(100deg,#f2fbff,#82e4dd 58%,#79adff);background-clip:text;-webkit-background-clip:text}.hero p{max-width:730px;margin:0;color:var(--muted);font-size:14px;line-height:1.75}.hero-note{padding:17px 18px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(135deg,rgba(62,229,209,.065),rgba(106,168,255,.04));color:var(--muted);font-size:12px;line-height:1.7}.hero-note strong{color:var(--text)}
+    .section{margin-top:18px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:11px}.section-head h3{margin:0;font-size:16px}.section-head p{margin:0;color:var(--muted);font-size:11px}
+    .panel{border:1px solid var(--line);border-radius:var(--radius);background:rgba(13,27,45,.86);box-shadow:0 22px 65px rgba(0,0,0,.25);overflow:hidden}.pad{padding:20px}
+    .workflow{display:grid;grid-template-columns:390px 1fr;gap:16px}.setup{display:grid;gap:15px}.fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}label.field{display:grid;gap:6px;color:var(--muted);font-size:10px}input,select{width:100%;height:39px;padding:0 10px;color:var(--text);outline:0;border:1px solid rgba(158,188,214,.24);border-radius:10px;background:#071423}input:focus,select:focus{border-color:rgba(62,229,209,.65);box-shadow:0 0 0 3px rgba(62,229,209,.08)}
+    .sensor-select{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.sensor-check{position:relative}.sensor-check input{position:absolute;opacity:0;pointer-events:none}.sensor-check label{min-height:50px;padding:8px;display:grid;align-content:center;gap:2px;border:1px solid var(--line);border-radius:11px;background:rgba(2,10,18,.3);cursor:pointer;transition:.15s}.sensor-check label b{font-size:11px}.sensor-check label span{color:var(--muted);font-size:9px}.sensor-check input:checked+label{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,transparent);box-shadow:inset 0 0 18px color-mix(in srgb,var(--c) 5%,transparent)}.sensor-check input:checked+label b{color:var(--c)}.sensor-check input:disabled+label{cursor:not-allowed;opacity:.55}
+    .workflow-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.workflow-buttons .save{grid-column:1/-1}.hint{padding:10px 11px;border-left:2px solid var(--blue);background:rgba(106,168,255,.055);color:var(--muted);font-size:10px;line-height:1.6}
+    .monitor{display:grid;grid-template-rows:auto 1fr}.modebar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}.metric{min-height:93px;padding:16px 18px;border-right:1px solid var(--line)}.metric:last-child{border-right:0}.metric span{display:block;color:var(--muted);font-size:10px}.metric strong{display:block;margin-top:9px;font-size:22px;letter-spacing:-.03em}.metric strong small{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0}
+    .progress-wrap{padding:17px 20px 0}.progress-top{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-bottom:7px}.progress{height:8px;border-radius:99px;background:#06111d;overflow:hidden}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:inherit;transition:width .1s linear}.progress.cleaning i{width:38%!important;animation:clean 1.1s ease-in-out infinite alternate}@keyframes clean{from{transform:translateX(-90%)}to{transform:translateX(260%)}}
+    .chartbox{padding:15px 20px 18px}.charttop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px}.charttop h4{margin:0;font-size:12px}.legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 10px}.legend span{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:9px}.legend i{width:7px;height:7px;border-radius:50%}canvas{display:block;width:100%;height:290px;border-radius:13px;background:rgba(2,9,16,.6)}
+    .sensor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}.sensor-card{position:relative;padding:15px;border:1px solid var(--line);border-radius:16px;background:rgba(16,34,56,.74);overflow:hidden;transition:.15s}.sensor-card.off{opacity:.42;filter:saturate(.55)}.sensor-card:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:var(--c)}.sensor-title{display:flex;align-items:center;justify-content:space-between;gap:8px}.sensor-title b{font-size:12px}.sensor-title span{padding:3px 6px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:8px}.value{margin:13px 0 10px;display:flex;align-items:baseline;gap:4px}.value strong{font-size:28px;letter-spacing:-.04em}.value small{color:var(--muted);font-size:10px}.submetrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}.submetrics div{padding:7px 8px;border:1px solid var(--line);border-radius:9px;background:rgba(2,9,16,.26)}.submetrics span{display:block;color:var(--muted);font-size:8px}.submetrics b{display:block;margin-top:3px;font-size:10px}
+    details{border:1px solid var(--line);border-radius:var(--radius);background:rgba(13,27,45,.78);overflow:hidden}summary{padding:17px 20px;cursor:pointer;font-weight:700;font-size:13px;list-style:none}summary::-webkit-details-marker{display:none}summary:after{content:"展开";float:right;color:var(--muted);font-size:10px;font-weight:500}details[open] summary:after{content:"收起"}.advanced{padding:0 20px 20px;border-top:1px solid var(--line)}.advanced-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:16px}.advanced-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.advanced p{color:var(--muted);font-size:10px;line-height:1.65}
+    .data-panel{display:grid;grid-template-columns:1fr 260px}.data-preview{height:190px;overflow:auto;padding:15px;background:rgba(2,9,16,.7);color:#9db6c9;font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}.data-info{padding:16px;border-left:1px solid var(--line);display:grid;align-content:start;gap:9px}.data-info div{padding:9px;border:1px solid var(--line);border-radius:10px}.data-info span{display:block;color:var(--muted);font-size:8px}.data-info b{display:block;margin-top:3px;font-size:12px}
+    .log{height:145px;padding:14px;overflow:auto;background:rgba(2,9,16,.72);color:#94adc2;font:10px/1.65 ui-monospace,monospace;white-space:pre-wrap}.foot{margin-top:14px;text-align:center;color:var(--muted);font-size:10px;line-height:1.7}.foot strong{color:var(--text)}
+    .toast{position:fixed;right:20px;bottom:20px;z-index:40;max-width:min(400px,calc(100% - 40px));padding:12px 15px;border:1px solid rgba(158,188,214,.3);border-radius:11px;background:rgba(12,25,41,.97);box-shadow:0 18px 50px rgba(0,0,0,.35);font-size:11px;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}.toast.error{border-color:rgba(255,114,128,.55)}
+    @media(max-width:1080px){.hero,.workflow{grid-template-columns:1fr}.sensor-grid{grid-template-columns:repeat(2,1fr)}.advanced-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:680px){.shell{width:calc(100% - 20px)}.topbar{margin:0 -10px;padding-inline:10px}.brand p,.status{display:none}.topactions .btn.red{display:none}.hero{padding-top:30px}.hero h2{font-size:39px}.modebar{grid-template-columns:1fr 1fr}.metric:nth-child(2){border-right:0}.metric:nth-child(-n+2){border-bottom:1px solid var(--line)}.sensor-grid{grid-template-columns:1fr}.sensor-select{grid-template-columns:repeat(2,1fr)}.workflow-buttons{grid-template-columns:1fr}.workflow-buttons .save{grid-column:auto}.advanced-grid{grid-template-columns:1fr 1fr}.data-panel{grid-template-columns:1fr}.data-info{grid-template-columns:1fr 1fr;border-left:0;border-top:1px solid var(--line)}canvas{height:230px}.legend{display:none}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar"><div class="topin">
+      <div class="brand"><div class="logo">EN</div><div><h1>MEMS 电子鼻检测工作台</h1><p>8 CHANNEL ACQUISITION / ESP32-S3</p></div></div>
+      <div class="topactions">
+        <div class="status" id="connPill"><i class="dot"></i><span id="connText">未连接</span></div>
+        <button class="btn red" id="emergencyBtn" disabled>紧急全停</button>
+        <button class="btn primary" id="connectBtn">连接设备</button>
+      </div>
+    </div></header>
+
+    <main>
+      <section class="hero">
+        <div><div class="eyebrow">ELECTRONIC NOSE EXPERIMENT</div><h2><span>检测、清洗、记录。</span></h2><p>先选择参与实验的传感器，再设定检测时长与采样频率。</p></div>
+        <div class="hero-note"><strong>标准流程</strong><br>连接设备 → 选择传感器 → 检测 → 自动完成 → 保存 TXT → 清洗 → 停止。</div>
+      </section>
+
+      <section class="workflow">
+        <div class="panel pad setup">
+          <div class="section-head" style="margin:0"><h3>检测设置</h3><p>本次实验</p></div>
+          <div class="fieldgrid">
+            <label class="field" style="grid-column:1/-1">样品名称<input id="sampleName" value="sample" maxlength="60" placeholder="例如：咖啡-01"></label>
+            <label class="field">检测时长 / 秒<input id="durationSec" type="number" min="1" max="3600" step="1" value="60"></label>
+            <label class="field">采样频率 / Hz<input id="sampleRate" type="number" min="1" max="20" step="1" value="10"></label>
+          </div>
+          <div><div class="section-head" style="margin-bottom:8px"><h3 style="font-size:12px">参与检测的传感器</h3><p>勾选决定曲线和TXT列</p></div><div class="sensor-select" id="sensorSelect"></div></div>
+          <div class="workflow-buttons">
+            <button class="btn green requires-port" id="detectBtn" disabled>开始检测</button>
+            <button class="btn yellow requires-port" id="cleanBtn" disabled>开始清洗</button>
+            <button class="btn red requires-port" id="stopBtn" disabled>停止</button>
+            <button class="btn primary save" id="saveBtn" disabled>保存本次检测 TXT</button>
+          </div>
+          <div class="hint">“停止”只结束检测/清洗并关闭气泵，不关闭加热；加热控制位于下方高级设置。“紧急全停”才会同时关闭气泵和全部加热。</div>
+        </div>
+
+        <div class="panel monitor">
+          <div class="modebar">
+            <div class="metric"><span>当前状态</span><strong id="modeText">待机</strong></div>
+            <div class="metric"><span>检测计时</span><strong><i id="elapsed" style="font-style:normal">0.0</i> <small>s</small></strong></div>
+            <div class="metric"><span>已记录</span><strong><i id="rowCount" style="font-style:normal">0</i> <small>行</small></strong></div>
+            <div class="metric"><span>气泵</span><strong id="pumpText">关闭</strong></div>
+          </div>
+          <div class="progress-wrap"><div class="progress-top"><span id="progressLabel">等待检测</span><span id="progressValue">0%</span></div><div class="progress" id="progress"><i id="progressBar"></i></div></div>
+          <div class="chartbox"><div class="charttop"><h4>实时响应曲线</h4><div class="legend" id="legend"></div></div><canvas id="chart"></canvas></div>
+        </div>
+      </section>
+
+      <section class="section"><div class="section-head"><h3>实时信号</h3><p>未勾选通道仍会读取，但不显示、不写入TXT</p></div><div class="sensor-grid" id="sensorGrid"></div></section>
+
+      <section class="section">
+        <details><summary>高级加热设置</summary><div class="advanced">
+          <p>这里配置所选传感器的加热功率包络。检测与清洗不会自动改变加热状态，建议先启动并预热稳定后再检测。</p>
+          <div class="advanced-grid" id="heaterForm">
+            <label class="field">波形<select data-key="wave"><option value="SINE">正弦波</option><option value="SQUARE">方波</option><option value="TRIANGLE">三角波</option><option value="SAWTOOTH">锯齿波</option><option value="CONSTANT">恒定</option></select></label>
+            <label class="field">最低电压 / V<input data-key="min" type="number" min="0" max="2.5" step="0.05" value="0"></label>
+            <label class="field">最高电压 / V<input data-key="max" type="number" min="0" max="2.5" step="0.05" value="2.5"></label>
+            <label class="field">周期 / ms<input data-key="period" type="number" min="500" max="3600000" step="100" value="4000"></label>
+            <label class="field">恒定电压 / V<input data-key="const" type="number" min="0" max="2.5" step="0.05" value="2"></label>
+            <label class="field">方波高温占比<input data-key="duty" type="number" min=".05" max=".95" step=".05" value=".5"></label>
+          </div>
+          <div class="advanced-actions"><button class="btn small requires-port" id="applyHeatBtn" disabled>应用到所选通道</button><button class="btn small requires-port" id="startHeatBtn" disabled>启动所选加热</button><button class="btn small requires-port" id="stopHeatBtn" disabled>停止所选加热</button><button class="btn small red requires-port" id="stopAllHeatBtn" disabled>停止全部加热</button></div>
+        </div></details>
+      </section>
+
+      <section class="section"><div class="section-head"><h3>本次检测数据</h3><p>只有检测阶段的数据会进入这里</p></div><div class="panel data-panel">
+        <div class="data-preview" id="dataPreview">尚无检测数据。</div>
+        <div class="data-info"><div><span>检测结果</span><b id="dataState">未开始</b></div><div><span>选中通道</span><b id="dataChannels">—</b></div><div><span>目标行数</span><b id="expectedRows">—</b></div><div><span>保存状态</span><b id="saveState">—</b></div><button class="btn small" id="discardBtn" disabled>清除本次数据</button></div>
+      </div></section>
+
+      <section class="section"><div class="section-head"><h3>设备日志</h3><p>串口状态与错误信息</p></div><div class="panel"><div class="log" id="log">[系统] 等待连接设备…</div></div></section>
+      <p class="foot"><strong>兼容性：</strong>请使用桌面版 Chrome 或 Edge。关闭网页或拔掉USB前请先点击“停止”或“紧急全停”。数据只保存在当前浏览器内存和你下载的TXT文件中。</p>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const N=8, COLORS=['#3ee5d1','#6aa8ff','#f5c867','#ff7f8d','#a78bfa','#4ade80','#fb923c','#38bdf8'];
+    const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+    const state={port:null,reader:null,writer:null,connected:false,keep:false,buf:'',pump:false,phase:'idle',
+      voltage:Array(N).fill(0),heater:Array(N).fill(0),duty:Array(N).fill(0),running:Array(N).fill(false),
+      history:Array.from({length:N},()=>[]),measurement:null,lastDataDeviceMs:null,timer:null};
+    const logEl=$('#log'), toastEl=$('#toast'); let toastTimer;
+
+    function toast(msg,error=false){toastEl.textContent=msg;toastEl.className=`toast show${error?' error':''}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.className='toast',2600)}
+    function log(msg,dir=''){const t=new Date().toLocaleTimeString('zh-CN',{hour12:false});logEl.textContent+=`\n[${t}] ${dir==='tx'?'→':dir==='rx'?'←':'·'} ${msg}`;const a=logEl.textContent.split('\n');if(a.length>160)logEl.textContent=a.slice(-130).join('\n');logEl.scrollTop=logEl.scrollHeight}
+    const selected=()=>$$('.sensor-choice:checked').map(x=>Number(x.value)-1);
+    const phaseActive=()=>state.phase==='detecting'||state.phase==='cleaning';
+
+    function buildChannels(){
+      for(let i=0;i<N;i++){
+        $('#sensorSelect').insertAdjacentHTML('beforeend',`<div class="sensor-check"><input class="sensor-choice" id="s${i+1}" type="checkbox" value="${i+1}" checked><label for="s${i+1}" style="--c:${COLORS[i]}"><b>MEMS ${i+1}</b><span class="pick-v">0.000 V</span></label></div>`);
+        $('#legend').insertAdjacentHTML('beforeend',`<span data-legend="${i}"><i style="background:${COLORS[i]}"></i>MEMS${i+1}</span>`);
+        $('#sensorGrid').insertAdjacentHTML('beforeend',`<article class="sensor-card" data-card="${i}" style="--c:${COLORS[i]}"><div class="sensor-title"><b>MEMS ${i+1}</b><span class="heat-state">加热停止</span></div><div class="value"><strong class="v">0.00000</strong><small>V</small></div><div class="submetrics"><div><span>等效加热</span><b><i class="h" style="font-style:normal">0.000</i> V</b></div><div><span>占空比</span><b><i class="d" style="font-style:normal">0.0</i>%</b></div></div></article>`);
+      }
+      $$('.sensor-choice').forEach(x=>x.addEventListener('change',()=>{savePrefs();refreshSelection();draw()}));
+    }
+
+    function refreshSelection(){const set=new Set(selected());for(let i=0;i<N;i++){$(`[data-card="${i}"]`).classList.toggle('off',!set.has(i));$(`[data-legend="${i}"]`).style.display=set.has(i)?'flex':'none'}$('#dataChannels').textContent=state.measurement?state.measurement.selected.map(i=>`M${i+1}`).join(', '):(set.size?[...set].map(i=>`M${i+1}`).join(', '):'—')}
+    function setSelectionLocked(lock){$$('.sensor-choice').forEach(x=>x.disabled=lock);$('#durationSec').disabled=lock;$('#sampleRate').disabled=lock;$('#sampleName').disabled=lock}
+
+    async function send(cmd){if(!state.connected||!state.writer){toast('请先连接设备',true);return false}try{await state.writer.write(new TextEncoder().encode(cmd+'\n'));log(cmd,'tx');return true}catch(e){log(`发送失败：${e.message}`);toast('串口发送失败',true);return false}}
+    async function connect(){if(state.connected)return disconnect();if(!('serial'in navigator)){toast('请使用桌面版 Chrome 或 Edge',true);return}try{state.port=await navigator.serial.requestPort();await state.port.open({baudRate:115200,dataBits:8,stopBits:1,parity:'none',flowControl:'none'});state.writer=state.port.writable.getWriter();state.reader=state.port.readable.getReader();state.connected=state.keep=true;state.buf='';updateConnection();log('串口连接成功，115200 baud');readLoop();setTimeout(()=>send('GET_CONFIG'),300)}catch(e){toast(e.name==='NotFoundError'?'未选择串口':`连接失败：${e.message}`,true);log(`连接失败：${e.message}`);await cleanup()}}
+    async function readLoop(){const dec=new TextDecoder();try{while(state.keep&&state.reader){const{value,done}=await state.reader.read();if(done)break;state.buf+=dec.decode(value,{stream:true});const lines=state.buf.split(/\r?\n/);state.buf=lines.pop()||'';lines.forEach(x=>x.trim()&&handleLine(x.trim()))}}catch(e){if(state.keep)log(`读取中断：${e.message}`)}finally{if(state.connected){state.connected=false;updateConnection();if(phaseActive()){state.phase='stopped';finishUi('连接中断')}toast('设备连接已断开；请确认气泵状态',true)}}}
+    async function cleanup(){state.keep=false;if(state.reader){try{await state.reader.cancel()}catch(_){}try{state.reader.releaseLock()}catch(_){}state.reader=null}if(state.writer){try{state.writer.releaseLock()}catch(_){}state.writer=null}if(state.port){try{await state.port.close()}catch(_){}state.port=null}}
+    async function disconnect(){if(phaseActive())await stopProcess();state.connected=false;await cleanup();updateConnection();log('串口已断开')}
+    function updateConnection(){$('#connPill').classList.toggle('on',state.connected);$('#connText').textContent=state.connected?'设备已连接':'未连接';$('#connectBtn').textContent=state.connected?'断开设备':'连接设备';$$('.requires-port').forEach(x=>x.disabled=!state.connected);$('#emergencyBtn').disabled=!state.connected}
+
+    function handleLine(line){if(!line.startsWith('DATA,'))log(line,'rx');const p=line.split(',');if(p[0]==='READY'){send('GET_CONFIG')}else if(p[0]==='DATA')parseData(p);else if(p[0]==='PUMP')setPump(p[1]==='1');else if(p[0]==='CONFIG'&&p.length>=9){const i=Number(p[1])-1;if(i>=0&&i<N)state.running[i]=p[8]==='1';updateSensors()}else if(p[0]==='ACK'){if(p[1]==='PUMP')setPump(p[2]==='ON');if(p[1]==='START'||p[1]==='STOP'){const on=p[1]==='START';if(p[2]==='ALL')state.running.fill(on);else if(Number(p[2])>=1&&Number(p[2])<=8)state.running[Number(p[2])-1]=on;updateSensors()}}else if(p[0]==='ERR'||p[0]==='FATAL')toast(line,true)}
+    function parseData(p){if(p.length<27)return;const deviceMs=Number(p[1]);state.lastDataDeviceMs=deviceMs;for(let i=0;i<N;i++){state.voltage[i]=Number(p[2+i])||0;state.heater[i]=Number(p[10+i])||0;state.duty[i]=Number(p[18+i])||0;state.running[i]=state.heater[i]>.001;state.history[i].push(state.voltage[i]);if(state.history[i].length>300)state.history[i].shift()}setPump(p[26]==='1');if(state.phase==='detecting')recordFrame(deviceMs);updateSensors();draw()}
+    function setPump(on){state.pump=on;$('#pumpText').textContent=on?'运行中':'关闭'}
+    function updateSensors(){for(let i=0;i<N;i++){const c=$(`[data-card="${i}"]`);$('.v',c).textContent=state.voltage[i].toFixed(5);$('.h',c).textContent=state.heater[i].toFixed(3);$('.d',c).textContent=(state.duty[i]*100).toFixed(1);$('.heat-state',c).textContent=state.running[i]?'加热中':'加热停止';$(`#s${i+1}+label .pick-v`).textContent=`${state.voltage[i].toFixed(3)} V`}}
+
+    function hasUnsaved(){return state.measurement&&state.measurement.rows.length&&!state.measurement.saved}
+    async function startDetection(){
+      if(!state.connected)return;if(phaseActive()){toast('请先停止当前流程',true);return}if(hasUnsaved()&&!confirm('上一组检测数据尚未保存，开始新检测会覆盖它。确定继续吗？'))return;
+      const sel=selected();if(!sel.length){toast('至少选择一个传感器',true);return}
+      const duration=Math.max(1,Math.min(3600,Number($('#durationSec').value)||60));const rate=Math.max(1,Math.min(20,Number($('#sampleRate').value)||10));$('#durationSec').value=duration;$('#sampleRate').value=rate;
+      state.measurement={name:$('#sampleName').value.trim()||'sample',startedAt:new Date(),duration,rate,selected:[...sel],rows:[],firstDeviceMs:null,nextDeviceMs:null,saved:false,finishedAt:null,status:'检测中'};
+      state.phase='detecting';setSelectionLocked(true);savePrefs();updateDataPanel();await send('PUMP,ON');startTicker();updateMode();toast('检测开始，正在记录数据');
+    }
+    async function startCleaning(){if(!state.connected)return;if(phaseActive()){toast('请先停止当前流程',true);return}state.phase='cleaning';setSelectionLocked(false);await send('PUMP,ON');startTicker();updateMode();toast('清洗开始；实时显示但不记录')}
+    async function stopProcess(){if(!phaseActive()){await send('PUMP,OFF');return}const wasDetecting=state.phase==='detecting';state.phase=wasDetecting?'stopped':'idle';if(wasDetecting&&state.measurement){state.measurement.status='手动停止';state.measurement.finishedAt=new Date()}await send('PUMP,OFF');stopTicker();setSelectionLocked(false);updateMode();updateDataPanel();toast(wasDetecting?'检测已停止，已保留当前数据':'清洗已停止')}
+    async function completeDetection(){if(state.phase!=='detecting')return;state.phase='complete';state.measurement.status='检测完成';state.measurement.finishedAt=new Date();await send('PUMP,OFF');stopTicker();setSelectionLocked(false);updateMode();updateDataPanel();toast('检测完成，可以保存 TXT 数据')}
+    function startTicker(){stopTicker();state.timer=setInterval(tick,100);tick()}
+    function stopTicker(){if(state.timer)clearInterval(state.timer);state.timer=null}
+    function tick(){if(state.phase==='detecting'&&state.measurement){const e=(Date.now()-state.measurement.startedAt.getTime())/1000;$('#elapsed').textContent=Math.min(e,state.measurement.duration).toFixed(1);const pct=Math.min(100,e/state.measurement.duration*100);$('#progressBar').style.width=pct+'%';$('#progressValue').textContent=Math.round(pct)+'%';$('#progressLabel').textContent=`检测中 · ${Math.max(0,state.measurement.duration-e).toFixed(1)} s 后完成`;if(e>=state.measurement.duration)completeDetection()}else if(state.phase==='cleaning'){$('#elapsed').textContent='0.0';$('#progressLabel').textContent='清洗中 · 不记录数据';$('#progressValue').textContent='LIVE'}}
+    function recordFrame(deviceMs){const m=state.measurement;if(!m)return;if(m.firstDeviceMs===null){m.firstDeviceMs=deviceMs;m.nextDeviceMs=deviceMs}if(deviceMs+.5<m.nextDeviceMs)return;const elapsed=(deviceMs-m.firstDeviceMs)/1000;if(elapsed>=m.duration)return;const values=m.selected.map(i=>state.voltage[i]);m.rows.push({time:elapsed,deviceMs,values});m.nextDeviceMs+=1000/m.rate;$('#rowCount').textContent=m.rows.length;updateDataPreview()}
+    function updateMode(){const names={idle:'待机',detecting:'检测中',cleaning:'清洗中',complete:'检测完成',stopped:'已停止'};$('#modeText').textContent=names[state.phase]||state.phase;$('#progress').classList.toggle('cleaning',state.phase==='cleaning');if(state.phase==='idle'){$('#elapsed').textContent='0.0';$('#progressBar').style.width='0';$('#progressValue').textContent='0%';$('#progressLabel').textContent='等待检测'}else if(state.phase==='complete'){$('#progressBar').style.width='100%';$('#progressValue').textContent='100%';$('#progressLabel').textContent='检测完成'}else if(state.phase==='stopped'){$('#progressLabel').textContent='检测已手动停止'}$('#detectBtn').disabled=!state.connected||phaseActive();$('#cleanBtn').disabled=!state.connected||phaseActive();$('#stopBtn').disabled=!state.connected||!phaseActive()}
+    function finishUi(label){stopTicker();setSelectionLocked(false);$('#progressLabel').textContent=label;updateMode();updateDataPanel()}
+
+    function txtContent(){const m=state.measurement;if(!m)return'';const names=m.selected.map(i=>`MEMS${i+1}_V`);const lines=[
+      '# MEMS Electronic Nose Detection Data',`# sample_name=${m.name}`,`# started_at=${m.startedAt.toISOString()}`,`# finished_at=${m.finishedAt?m.finishedAt.toISOString():''}`,`# status=${m.status}`,`# requested_duration_s=${m.duration}`,`# sample_rate_hz=${m.rate}`,`# selected_channels=${m.selected.map(i=>`MEMS${i+1}`).join(',')}`,`# row_count=${m.rows.length}`,
+      ['time_s',...names].join('\t')];
+      m.rows.forEach(r=>lines.push([r.time.toFixed(3),...r.values.map(v=>v.toFixed(6))].join('\t')));return lines.join('\n')+'\n'}
+    function safeName(s){return(s||'sample').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,50)}
+    function saveTxt(){const m=state.measurement;if(!m||!m.rows.length){toast('没有可以保存的检测数据',true);return}const blob=new Blob([txtContent()],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`${safeName(m.name)}_${m.startedAt.toISOString().slice(0,19).replaceAll(':','-')}.txt`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);m.saved=true;updateDataPanel();toast('TXT 数据已保存到本地')}
+    function updateDataPreview(){const m=state.measurement;if(!m||!m.rows.length){$('#dataPreview').textContent='尚无检测数据。';return}const head=['time_s',...m.selected.map(i=>`M${i+1}_V`)].join('\t');const rows=m.rows.slice(-8).map(r=>[r.time.toFixed(3),...r.values.map(v=>v.toFixed(5))].join('\t'));$('#dataPreview').textContent=`${head}\n${rows.join('\n')}${m.rows.length>8?'\n… 显示最后 8 行':''}`}
+    function updateDataPanel(){const m=state.measurement;$('#rowCount').textContent=m?m.rows.length:0;$('#dataState').textContent=m?m.status:'未开始';$('#expectedRows').textContent=m?`${Math.round(m.duration*m.rate)} 行`:'—';$('#saveState').textContent=!m?'—':m.saved?'已保存':m.rows.length?'待保存':'无数据';$('#saveBtn').disabled=!(m&&m.rows.length);$('#discardBtn').disabled=!m;refreshSelection();updateDataPreview()}
+    function discard(){if(!state.measurement)return;if(hasUnsaved()&&!confirm('确定清除尚未保存的检测数据吗？'))return;state.measurement=null;if(!phaseActive())state.phase='idle';updateMode();updateDataPanel();toast('本次检测数据已清除')}
+
+    function formValues(){const o={};$$('[data-key]',$('#heaterForm')).forEach(x=>o[x.dataset.key]=x.value);return o}
+    function normalized(c){return{wave:['TRIANGLE','SINE','SQUARE','SAWTOOTH','CONSTANT'].includes(c.wave)?c.wave:'SINE',min:Math.max(0,Math.min(2.5,Number(c.min)||0)),max:Math.max(0,Math.min(2.5,Number(c.max)||0)),period:Math.max(500,Math.min(3600000,Math.round(Number(c.period)||4000))),const:Math.max(0,Math.min(2.5,Number(c.const)||0)),duty:Math.max(.05,Math.min(.95,Number(c.duty)||.5))}}
+    async function sendHeatConfig(ch,c){for(const cmd of[`SET,${ch},WAVE,${c.wave}`,`SET,${ch},MIN,${c.min}`,`SET,${ch},MAX,${c.max}`,`SET,${ch},PERIOD,${c.period}`,`SET,${ch},CONST,${c.const}`,`SET,${ch},DUTY,${c.duty}`])await send(cmd)}
+    async function applyHeat(start=false){const sel=selected();if(!sel.length){toast('至少选择一个传感器',true);return}const c=normalized(formValues());for(const i of sel){await sendHeatConfig(i+1,c);if(start)await send(`START,${i+1}`)}savePrefs();toast(start?'所选通道已配置并启动加热':'加热参数已应用')}
+    async function stopSelectedHeat(){for(const i of selected())await send(`STOP,${i+1}`);toast('所选通道加热已停止')}
+
+    function draw(){const cvs=$('#chart'),r=cvs.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2),w=Math.max(300,Math.floor(r.width*d)),h=Math.max(180,Math.floor(r.height*d));if(cvs.width!==w||cvs.height!==h){cvs.width=w;cvs.height=h}const x=cvs.getContext('2d'),p={l:46*d,r:16*d,t:16*d,b:25*d},cw=w-p.l-p.r,ch=h-p.t-p.b;x.clearRect(0,0,w,h);x.font=`${9*d}px ui-monospace`;for(let i=0;i<=5;i++){const y=p.t+ch*i/5;x.strokeStyle='rgba(158,188,214,.12)';x.beginPath();x.moveTo(p.l,y);x.lineTo(w-p.r,y);x.stroke();x.fillStyle='rgba(143,168,189,.72)';x.textAlign='right';x.fillText(`${(3.5*(5-i)/5).toFixed(1)} V`,p.l-7*d,y+3*d)}const set=new Set(selected()),count=Math.max(2,...state.history.map(a=>a.length));state.history.forEach((a,i)=>{if(!set.has(i)||!a.length)return;x.strokeStyle=COLORS[i];x.lineWidth=1.45*d;x.beginPath();a.forEach((v,j)=>{const px=p.l+cw*j/(count-1),py=p.t+ch*(1-Math.max(0,Math.min(3.5,v))/3.5);j?x.lineTo(px,py):x.moveTo(px,py)});x.stroke()});x.fillStyle='rgba(143,168,189,.62)';x.textAlign='center';x.fillText('实时窗口',p.l+cw/2,h-7*d)}
+
+    function savePrefs(){try{localStorage.setItem('mems-nose-experiment-v2',JSON.stringify({name:$('#sampleName').value,duration:$('#durationSec').value,rate:$('#sampleRate').value,selected:selected(),heater:formValues()}))}catch(_){}}
+    function loadPrefs(){try{const p=JSON.parse(localStorage.getItem('mems-nose-experiment-v2'));if(!p)return;$('#sampleName').value=p.name||'sample';$('#durationSec').value=p.duration||60;$('#sampleRate').value=p.rate||10;if(Array.isArray(p.selected))$$('.sensor-choice').forEach((x,i)=>x.checked=p.selected.includes(i));if(p.heater)$$('[data-key]',$('#heaterForm')).forEach(x=>{if(p.heater[x.dataset.key]!==undefined)x.value=p.heater[x.dataset.key]})}catch(_){}}
+
+    buildChannels();loadPrefs();refreshSelection();updateSensors();updateConnection();updateMode();updateDataPanel();draw();
+    $('#connectBtn').addEventListener('click',connect);$('#detectBtn').addEventListener('click',startDetection);$('#cleanBtn').addEventListener('click',startCleaning);$('#stopBtn').addEventListener('click',stopProcess);$('#saveBtn').addEventListener('click',saveTxt);$('#discardBtn').addEventListener('click',discard);
+    $('#emergencyBtn').addEventListener('click',async()=>{state.phase='stopped';if(state.measurement&&state.measurement.status==='检测中'){state.measurement.status='紧急停止';state.measurement.finishedAt=new Date()}await send('PUMP,OFF');await send('STOP,ALL');stopTicker();setSelectionLocked(false);updateMode();updateDataPanel();toast('已关闭气泵和全部加热')});
+    $('#applyHeatBtn').addEventListener('click',()=>applyHeat(false));$('#startHeatBtn').addEventListener('click',()=>applyHeat(true));$('#stopHeatBtn').addEventListener('click',stopSelectedHeat);$('#stopAllHeatBtn').addEventListener('click',()=>send('STOP,ALL'));
+    ['sampleName','durationSec','sampleRate'].forEach(id=>$(`#${id}`).addEventListener('change',savePrefs));$$('#heaterForm input,#heaterForm select').forEach(x=>x.addEventListener('change',savePrefs));window.addEventListener('resize',draw);window.addEventListener('beforeunload',e=>{if(phaseActive()||hasUnsaved()){e.preventDefault();e.returnValue=''}});if('serial'in navigator)navigator.serial.addEventListener('disconnect',e=>{if(e.target===state.port)disconnect()});
+  </script>
+</body>
+</html>
